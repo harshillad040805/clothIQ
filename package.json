@@ -1,0 +1,28 @@
+{
+  "name": "cloth-store",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "express-session": "^1.18.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "multer": "^1.4.5-lts.2",
+    "sequelize": "^6.37.6",
+    "sqlite3": "^5.1.7"
+  },
+  "description": "First open terminal and type command: npx nodemon\r then open any browser and go to http://localhost:3000/",
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

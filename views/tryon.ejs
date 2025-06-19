@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title><%= title %></title>
+		<style>
+			/* Reset and base styles */
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Arial", sans-serif;
+				line-height: 1.6;
+				background-color: #f5f5f5;
+				color: #333;
+			}
+
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+
+			/* Header styles */
+			header {
+				text-align: center;
+				padding: 40px 0;
+			}
+
+			header h1 {
+				font-size: 2.5rem;
+				color: #d35400;
+				margin-bottom: 10px;
+			}
+
+			header p {
+				color: #666;
+				font-size: 1.1rem;
+			}
+
+			/* Main content styles */
+			.result-container {
+				background-color: white;
+				border-radius: 15px;
+				padding: 30px;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.result-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 30px;
+				margin-bottom: 30px;
+			}
+
+			.original-images {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+			}
+
+			.original-selfie,
+			.original-apparel,
+			.virtual-result > div {
+				background-color: #f8f9fa;
+				padding: 20px;
+				border-radius: 10px;
+				text-align: center;
+			}
+
+			.original-selfie h3,
+			.original-apparel h3,
+			.virtual-result h3 {
+				color: #d35400;
+				margin-bottom: 15px;
+				font-size: 1.2rem;
+			}
+
+			canvas {
+				max-width: 100%;
+				border-radius: 8px;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.note {
+				color: #666;
+				font-size: 0.9rem;
+				margin-top: 15px;
+				font-style: italic;
+			}
+
+			/* Button styles */
+			.action-buttons {
+				display: flex;
+				justify-content: center;
+				gap: 20px;
+				margin-top: 30px;
+			}
+
+			.btn {
+				padding: 12px 25px;
+				border-radius: 5px;
+				text-decoration: none;
+				font-weight: bold;
+				transition: all 0.3s ease;
+			}
+
+			.btn-primary {
+				background-color: #d35400;
+				color: white;
+				border: 2px solid #d35400;
+			}
+
+			.btn-secondary {
+				background-color: transparent;
+				color: #d35400;
+				border: 2px solid #d35400;
+			}
+
+			.btn-primary:hover {
+				background-color: #e67e22;
+				border-color: #e67e22;
+			}
+
+			.btn-secondary:hover {
+				background-color: #d35400;
+				color: white;
+			}
+
+			/* Footer styles */
+			footer {
+				text-align: center;
+				padding: 20px 0;
+				color: #666;
+				margin-top: 40px;
+			}
+
+			/* Responsive design */
+			@media (max-width: 768px) {
+				.result-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.action-buttons {
+					flex-direction: column;
+					align-items: center;
+				}
+
+				.btn {
+					width: 100%;
+					max-width: 300px;
+					text-align: center;
+				}
+
+				header h1 {
+					font-size: 2rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Your Virtual Try-On</h1>
+				<p>Here's how the apparel looks on you!</p>
+			</header>
+
+			<main>
+				<div class="result-container">
+					<div class="result-grid">
+						<div class="original-images">
+							<div class="original-selfie">
+								<h3>Your Photo</h3>
+								<canvas
+									id="selfieCanvas"
+									width="400"
+									height="600"
+								></canvas>
+							</div>
+
+							<div class="original-apparel">
+								<h3>Selected Apparel</h3>
+								<canvas
+									id="apparelCanvas"
+									width="400"
+									height="600"
+								></canvas>
+							</div>
+						</div>
+
+						<div class="virtual-result">
+							<div>
+								<h3>Try-On Result</h3>
+								<canvas
+									id="resultCanvas"
+									width="400"
+									height="600"
+								></canvas>
+							</div>
+							<p class="note">
+								Note: This is a simplified visualization. A
+								production app would use advanced computer
+								vision and 3D modeling.
+							</p>
+						</div>
+					</div>
+
+					<div class="action-buttons">
+						<a href="/upload" class="btn btn-secondary"
+							>Try Another Outfit</a
+						>
+						<a href="/home" class="btn btn-primary">Back to Home</a>
+					</div>
+				</div>
+			</main>
+
+			<footer>
+				<p>
+					&copy; <%= new Date().getFullYear() %> Virtual Fashion
+					Try-On
+				</p>
+			</footer>
+		</div>
+
+		<script>
+			window.onload = function () {
+				const selfieCanvas = document.getElementById("selfieCanvas");
+				const apparelCanvas = document.getElementById("apparelCanvas");
+				const resultCanvas = document.getElementById("resultCanvas");
+
+				const selfieCtx = selfieCanvas.getContext("2d");
+				const apparelCtx = apparelCanvas.getContext("2d");
+				const resultCtx = resultCanvas.getContext("2d");
+
+				// Load the selfie image
+				const selfieImg = new Image();
+				selfieImg.crossOrigin = "anonymous";
+
+				// Load the apparel image
+				const apparelImg = new Image();
+				apparelImg.crossOrigin = "anonymous";
+
+				// Draw the composite image when both images are loaded
+				Promise.all([
+					new Promise((resolve) => {
+						selfieImg.onload = resolve;
+					}),
+					new Promise((resolve) => {
+						apparelImg.onload = resolve;
+					}),
+				]).then(() => {
+					// Clear canvas
+					resultCtx.clearRect(
+						0,
+						0,
+						resultCanvas.width,
+						resultCanvas.height
+					);
+
+					// Draw selfie as background
+					const selfieAspect = selfieImg.width / selfieImg.height;
+					let selfieWidth = resultCanvas.width;
+					let selfieHeight = resultCanvas.width / selfieAspect;
+
+					if (selfieHeight < resultCanvas.height) {
+						selfieHeight = resultCanvas.height;
+						selfieWidth = resultCanvas.height * selfieAspect;
+					}
+
+					const selfieX = (resultCanvas.width - selfieWidth) / 2;
+					const selfieY = (resultCanvas.height - selfieHeight) / 2;
+
+					resultCtx.drawImage(
+						selfieImg,
+						selfieX,
+						selfieY,
+						selfieWidth,
+						selfieHeight
+					);
+
+					// Calculate apparel position (simplified - in a real app this would use AI to detect body position)
+					const apparelWidth = resultCanvas.width * 0.8;
+					const apparelHeight =
+						(apparelImg.height / apparelImg.width) * apparelWidth;
+					const apparelX = (resultCanvas.width - apparelWidth) / 2;
+					const apparelY = resultCanvas.height * 0.3; // Position at roughly chest level
+
+					// Draw apparel with some transparency to blend
+					resultCtx.globalAlpha = 0.85;
+					resultCtx.drawImage(
+						apparelImg,
+						apparelX,
+						apparelY,
+						apparelWidth,
+						apparelHeight
+					);
+					resultCtx.globalAlpha = 1.0;
+
+					// Add a subtle overlay to make it look more integrated
+					resultCtx.fillStyle = "rgba(255, 255, 255, 0.1)";
+					resultCtx.fillRect(
+						0,
+						0,
+						resultCanvas.width,
+						resultCanvas.height
+					);
+				});
+			};
+		</script>
+	</body>
+</html>

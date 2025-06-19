@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloth IQ</title>
+    <link rel="icon" type="image/x-icon" href="assest/img/2-removebg-preview.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #333;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar .logo img {
+            height: 50px;
+        }
+
+        .menu-items {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #444;
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-container {
+            background-color: #444;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .dropdown-container.open {
+            max-height: 500px;
+            /* Increased to accommodate all items */
+            opacity: 1;
+            visibility: visible;
+            padding-left: 15px;
+        }
+
+        .menu-item.dropdown {
+            position: relative;
+        }
+
+        .menu-item.dropdown .fa-caret-down {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item.dropdown.active .fa-caret-down {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background-color: #555;
+        }
+
+        .active {
+            background-color: #d35400;
+        }
+
+        /* Main Content Styles */
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* New layout structure based on the wireframe */
+        .tryon-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Info card - first column, spans 1 row */
+        .info-card {
+            grid-column: 1;
+            grid-row: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Selfie section - first column, second row */
+        .selfie-section {
+            grid-column: 1;
+            grid-row: 2;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Measurements section - second column, spans all rows */
+        .measurements-section {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Apparel and accessories section - third column, spans all rows */
+        .apparel-section {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+
+            border-radius: 15px;
+            padding: 25px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Info Card Styles */
+        .info-card h2 {
+            color: #444;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .steps-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding-left: 10px;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            color: #d35400;
+            font-weight: 500;
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter) ".";
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* Selfie Section Styles */
+        .selfie-box {
+            width: 150px;
+            height: 150px;
+            margin: 15px auto;
+            border: 2px solid #d35400;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selfie-box img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-align: center;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #d35400;
+            color: #d35400;
+        }
+
+        .btn-outline:hover {
+            background: #d35400;
+            color: white;
+        }
+
+        .btn-filled {
+            background: #d35400;
+            border: 2px solid #d35400;
+            color: white;
+        }
+
+        .btn-filled:hover {
+            background: #b44600;
+            border-color: #b44600;
+        }
+
+        /* Measurements Section Styles */
+        .measurements-section h2 {
+            color: #444;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Apparel Section Styles */
+        .apparel-section h2 {
+            color: #444;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .apparel-container,
+        .accessory-container {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .apparel-box,
+        .accessory-box {
+            width: 150px;
+            height: 150px;
+            margin: 10px auto;
+            border: 1px solid #fffcfc;
+
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .apparel-box img,
+        .accessory-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Results Section */
+        .results-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .tryon-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .info-card,
+            .selfie-section,
+            .measurements-section,
+            .apparel-section {
+                grid-column: 1;
+            }
+
+            .info-card {
+                grid-row: 1;
+            }
+
+            .selfie-section {
+                grid-row: 2;
+            }
+
+            .measurements-section {
+                grid-row: 3;
+            }
+
+            .apparel-section {
+                grid-row: 4;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="assest/img/2-removebg-preview.png" alt="Cloth IQ Logo">
+                </div>
+            </div>
+            <div class="menu-items">
+                <div class="menu-item active">
+                    <i class="fas fa-home"></i> Home
+                </div>
+                <div class="menu-item dropdown">
+                    <i class="fas fa-tshirt"></i> Products
+                    <i class="fas fa-caret-down" style="float: right;"></i>
+                </div>
+                <div class="dropdown-container" style="display: flex;flex-direction: column;">
+                    <a href="/dresses" class="dropdown-item" style="text-decoration: none; color: white;">Dresses</a>
+                    <a href="/tops" class="dropdown-item" style="text-decoration: none; color: white;">Tops</a>
+                    <a href="/pants" class="dropdown-item" style="text-decoration: none; color: white;">Pants</a>
+                    <a href="/accessories" class="dropdown-item"
+                        style="text-decoration: none; color: white;">Accessories</a>
+                </div>
+                <div class="menu-item dropdown">
+                    <i class="fas fa-user"></i> My Account
+                    <i class="fas fa-caret-down" style="float: right;"></i>
+                </div>
+                <div class="dropdown-container">
+                    <a href="/profile" style="text-decoration: none;color: #f5f5f5;">
+                        <div class="dropdown-item">Profile</div>
+                    </a>
+                    <a href="/orders" style="text-decoration: none;color: #f5f5f5;">
+                        <div class="dropdown-item">Order</div>
+                    </a>
+                    <a href="/wishlist" style="text-decoration: none;color: #f5f5f5;">
+                        <div class="dropdown-item">Wishlist</div>
+                    </a>
+                    <a href="/settings" style="text-decoration: none;color: #f5f5f5;">
+                        <div class="dropdown-item">Settings</div>
+                    </a>
+
+                </div>
+                <a href="/tryon" style="text-decoration: none; color: white;">
+                    <div class="menu-item">
+                        <i class="fas fa-magic"></i> Virtual Try On
+                    </div>
+                </a>
+                <div class="menu-item">
+                    <i class="fas fa-heart"></i> Favorites
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-question-circle"></i> Help
+                </div>
+                <a href="/logout" style="text-decoration: none;color: white;">
+                    <div class="menu-item">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="container">
+                <header>
+                    <h1>Virtual Try On</h1>
+                    <div class="user-controls">
+                        <span class="user-name">Welcome, User</span>
+                    </div>
+                </header>
+
+                <!-- New Layout Structure Based on Wireframe -->
+                <div class="tryon-layout">
+                    <!-- Info Card - First Column, First Row -->
+                    <div class="info-card">
+                        <h2>How To Make Your Selfie Model</h2>
+                        <ol class="steps-list">
+                            <li>Upload your selfie</li>
+                            <li>Enter your body measurement</li>
+                            <li>Choose apparel, accessory to try-on</li>
+                            <li>Your selfie model is ready!</li>
+                        </ol>
+                    </div>
+
+                    <!-- Selfie Section - First Column, Second Row -->
+                    <div class="selfie-section">
+                        <h3>Selfie</h3>
+                        <div class="selfie-box">
+                            <img id="previewImg" src="assest/img/upload-icon.png" alt="Upload" style="width: 200px; height: auto;">
+                        </div>
+                    
+                        <!-- Hidden file input -->
+                        <input type="file" id="fileInput" style="display: none;" accept="image/*" capture="user">
+                    
+                        <!-- Visible button to trigger file input -->
+                        <button class="btn btn-outline" type="button" onclick="document.getElementById('fileInput').click()">
+                            Upload Selfie
+                        </button>
+                    </div>
+                    
+                    <script>
+                        // Preview the selected image
+                        document.getElementById('fileInput').addEventListener('change', function (event) {
+                            const file = event.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    document.getElementById('previewImg').src = e.target.result;
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    </script>
+                    
+                    
+                    <!-- Measurements Section - Second Column -->
+                    <div class="measurements-section">
+                        <h2>Enter Body Measurement</h2>
+                        <form>
+                            <div class="form-group">
+                                <label>Height</label>
+                                <input type="number" class="form-control" placeholder="cm">
+                            </div>
+                            <div class="form-group">
+                                <label>Weight</label>
+                                <input type="number" class="form-control" placeholder="kg">
+                            </div>
+                            <div class="form-group">
+                                <label>Bust</label>
+                                <input type="number" class="form-control" placeholder="inches">
+                            </div>
+                            <div class="form-group">
+                                <label>Waist</label>
+                                <input type="number" class="form-control" placeholder="inches">
+                            </div>
+                            <div class="form-group">
+                                <label>Hip</label>
+                                <input type="number" class="form-control" placeholder="inches">
+                            </div>
+                            <div class="form-group">
+                                <label>Shoulder Width</label>
+                                <input type="number" class="form-control" placeholder="inches">
+                            </div>
+                        </form>
+                        <button class="btn btn-outline" type="file" accept=".csv,.json,.pdf">Your Body
+                            Measurement</button>
+                    </div>
+
+                    <!-- Apparel Section - Third Column -->
+                    <div class="apparel-section">
+                        <!-- Apparel Container -->
+                        <div class="apparel-container">
+                            <h3>Apparel</h3>
+
+                            <div class="apparel-box">
+                                <img src="assest/img/apparel-placeholder.jpg" id="apparelInput" alt="Apparel">
+
+                            </div>
+                            <button class="btn btn-outline" type="file" accept="image/*" capture="user"
+                                onclick="document.getElementById('apparelInput').click()">Choose Apparel</button>
+                        </div>
+
+                        <!-- Accessory Container -->
+                        <div class="accessory-container">
+                            <h3>Accessory</h3>
+                            <div class="accessory-box">
+                                <img src="assest/img/accessory-placeholder.jpg" alt="Accessory">
+                            </div>
+                            <button class="btn btn-outline"
+                                onclick="document.getElementById('fileInput').click()">Choose Accessory</button>
+                        </div>
+
+                        <!-- Final Try-On Button -->
+
+                        <button class="btn btn-outline" id="myButton" type="submit">Upload & Go to Try-On</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <button >Go to Google</button> -->
+
+    <script type="text/javascript">
+        document.getElementById("myButton").onclick = function () {
+            window.location.href = "/tryon";
+        };
+
+        function uploadImage() {
+            const input = document.getElementById('imageInput');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    localStorage.setItem('uploadedImage', e.target.result);
+                    window.location.href = 'display.html';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdownItems = document.querySelectorAll('.menu-item.dropdown');
+            const fileInput = document.getElementById('fileInput');
+            const imgPreview = document.getElementById('previewImg');
+            const apparelInput = document.querySelector('#apparelInput');
+
+            // Dropdown toggle functionality
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.stopPropagation(); // Prevent event bubbling
+
+                    // Toggle active state on dropdown item
+                    this.classList.toggle('active');
+
+                    // Toggle dropdown container
+                    const dropdownContainer = this.nextElementSibling;
+                    const isOpen = dropdownContainer.classList.contains('open');
+
+                    // Close all other dropdowns first
+                    document.querySelectorAll('.dropdown-container.open').forEach(container => {
+                        if (container !== dropdownContainer) {
+                            container.classList.remove('open');
+                            container.previousElementSibling.classList.remove('active');
+                        }
+                    });
+
+                    // Toggle current dropdown
+                    dropdownContainer.classList.toggle('open');
+                });
+            });
+
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.menu-item.dropdown')) {
+                    document.querySelectorAll('.dropdown-container.open').forEach(container => {
+                        container.classList.remove('open');
+                        container.previousElementSibling.classList.remove('active');
+                    });
+                }
+            });
+
+            // File upload handling
+            if (apparelInput && imgPreview) {
+                fileInput.addEventListener('change', function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imgPreview.src = e.target.result;
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

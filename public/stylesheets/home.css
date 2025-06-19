@@ -1,0 +1,13 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    
+}
+
+.body-measurment{
+    height:560px;
+    width: 250px;
+    display: flex;
+
+}

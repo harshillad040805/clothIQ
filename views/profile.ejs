@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= user.name %>'s Profile</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+    }
+    
+    .profile-container {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        width: 300px;
+    }
+    
+    .profile-container img {
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+    }
+</style>
+    </head>
+<body>
+    <div class="profile-container">
+        <img src="<%= user.avatar %>" alt="Avatar">
+        <h1><%= user.name %></h1>
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Age:</strong> <%= user.age %></p>
+        <p><strong>Bio:</strong> <%= user.bio %></p>
+    </div>
+</body>
+</html>
